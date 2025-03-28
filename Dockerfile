@@ -1,25 +1,29 @@
-# Use official .NET SDK image to build the app
+# Use the official .NET 8 runtime as the base image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+
+# Expose the port that Render provides
+EXPOSE ${PORT}
+
+# Use the .NET 8 SDK to build the application
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Copy project files and restore dependencies
+COPY ["GameStore.Api.csproj", "./"]
+RUN dotnet restore "GameStore.Api.csproj"
+
+# Copy all source files and publish the app
+COPY . .
+RUN dotnet publish "GameStore.Api.csproj" -c Release -o /app/publish
+
+# Build the runtime image
+FROM base AS final
 WORKDIR /app
+COPY --from=build /app/publish .
 
-# Copy and restore dependencies
-COPY *.sln ./
-COPY GameStore.Api/*.csproj GameStore.Api/
-RUN dotnet restore GameStore.Api/GameStore.Api.csproj
+# Set the URL to listen on the port provided by Render
+ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
 
-# Copy the remaining source code and build the app
-COPY GameStore.Api/ GameStore.Api/
-WORKDIR /app/GameStore.Api
-RUN dotnet publish -c Release -o /app/out
-
-# Use the runtime image for final container
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
-WORKDIR /app
-COPY --from=build /app/out ./
-
-# Expose the port Render will use
-ENV PORT=8080
-EXPOSE 8080
-
-# Start the application
-CMD ["dotnet", "GameStore.Api.dll"]
+# Run the application
+ENTRYPOINT ["dotnet", "GameStore.Api.dll"]
