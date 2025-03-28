@@ -12,6 +12,10 @@ var app = builder.Build();
 app.MapGamesEndpoints();
 app.MapGenresEndpoints();
 
+if (Environment.GetEnvironmentVariable("RENDER") != null)
+{
+    /*Keeping this here for Render.com*/
+}
 await app.MigrateDbAsync();
 
 app.Run();
