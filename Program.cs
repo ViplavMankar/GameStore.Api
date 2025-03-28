@@ -23,6 +23,9 @@ if (app.Environment.IsDevelopment())
 else if (Environment.GetEnvironmentVariable("RENDER") != null)
 {
     /*Keeping this here for Render.com*/
+    // Read the PORT from environment variables (default: 5000)
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 await app.MigrateDbAsync();
 
