@@ -13,6 +13,9 @@ WORKDIR /src
 COPY ["GameStore.Api.csproj", "./"]
 RUN dotnet restore "GameStore.Api.csproj"
 
+# Create /app/data directory and set permissions
+RUN mkdir -p /app/data && chmod -R 777 /app/data
+
 # Copy all source files and publish the app
 COPY . .
 RUN dotnet publish "GameStore.Api.csproj" -c Release -o /app/publish
