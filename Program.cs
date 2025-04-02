@@ -39,9 +39,6 @@ else
 
 builder.Services.AddNpgsql<GameStoreContext>(gameStoreConnectionString);
 
-var connStr = builder.Configuration.GetConnectionString("GameStoreString");
-Console.WriteLine($"🔍 Connection String: {connStr}");
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

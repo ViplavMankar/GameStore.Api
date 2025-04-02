@@ -12,12 +12,6 @@ public static class DataExtensions
 
         try
         {
-            // Log connection string for debugging purposes
-            var conn = dbContext.Database.GetDbConnection();
-            var connectionString = conn.ConnectionString;
-            Console.WriteLine($"Using connection string: {connectionString}");
-
-            // Attempt migration
             await dbContext.Database.MigrateAsync();
             Console.WriteLine("Database migration succeeded.");
         }
