@@ -33,6 +33,17 @@ else
         {
             throw new InvalidOperationException("DATABASE_URL environment variable is not set.");
         }
+        // builder.Services.AddCors(options =>
+        // {
+        //     options.AddPolicy("AllowRenderOrigin",
+        //         policy =>
+        //         {
+        //             policy.WithOrigins("https://gamestoreweb.onrender.com")  // Use your actual frontend URL
+        //                 .AllowAnyMethod()
+        //                 .AllowAnyHeader()
+        //                 .AllowCredentials(); // Important for anti-forgery tokens
+        //         });
+        // });
     }
 }
 
@@ -45,12 +56,18 @@ var app = builder.Build();
 
 app.MapGamesEndpoints();
 app.MapGenresEndpoints();
+app.MapHealthEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// else
+// {
+//     if (Environment.GetEnvironmentVariable("RENDER") != null)
+//         app.UseCors("AllowRenderOrigin"); // Enable the CORS policy
+// }
 // to Apply migrations use this custom Middleware below
 await app.MigrateDbAsync();
 
