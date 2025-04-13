@@ -2,7 +2,9 @@ using GameStore.Api.Data;
 using GameStore.Api.Dtos;
 using GameStore.Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
-// using Npgsql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,19 +35,23 @@ else
         {
             throw new InvalidOperationException("DATABASE_URL environment variable is not set.");
         }
-        // builder.Services.AddCors(options =>
-        // {
-        //     options.AddPolicy("AllowRenderOrigin",
-        //         policy =>
-        //         {
-        //             policy.WithOrigins("https://gamestoreweb.onrender.com")  // Use your actual frontend URL
-        //                 .AllowAnyMethod()
-        //                 .AllowAnyHeader()
-        //                 .AllowCredentials(); // Important for anti-forgery tokens
-        //         });
-        // });
     }
 }
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtKey = builder.Configuration["Jwt:Key"];
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddNpgsql<GameStoreContext>(gameStoreConnectionString);
 
@@ -54,6 +60,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapGamesEndpoints();
 app.MapGenresEndpoints();
 app.MapHealthEndpoints();
@@ -63,12 +71,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// else
-// {
-//     if (Environment.GetEnvironmentVariable("RENDER") != null)
-//         app.UseCors("AllowRenderOrigin"); // Enable the CORS policy
-// }
-// to Apply migrations use this custom Middleware below
 await app.MigrateDbAsync();
 
 app.Run();
