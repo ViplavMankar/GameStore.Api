@@ -2,50 +2,62 @@ using GameStore.Api.Data;
 using GameStore.Api.Dtos;
 using GameStore.Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
-// using Npgsql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var gameStoreConnectionString = "";
+var gameStoreConnectionString = string.Empty;
+var jwtKey = string.Empty;
 
 if (builder.Environment.IsDevelopment())
 {
-    if (builder.Configuration.GetConnectionString("GameStoreString") == null)
-    {
-        throw new InvalidOperationException(" is not set.");
-    }
     gameStoreConnectionString = builder.Configuration.GetConnectionString("GameStoreString");
     if (string.IsNullOrEmpty(gameStoreConnectionString))
     {
-        throw new InvalidOperationException("appsetting value not set.");
+        throw new InvalidOperationException("gamestore connection string appsetting value not set.");
+    }
+    jwtKey = builder.Configuration["Jwt:Key"];
+    if (string.IsNullOrEmpty(jwtKey))
+    {
+        throw new InvalidOperationException("jwtkey appsetting value not set.");
     }
 }
 else
 {
     if (Environment.GetEnvironmentVariable("RENDER") != null)
     {
-        // Read the PORT from environment variables (default: 5000)
         var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
         builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-        gameStoreConnectionString = Environment.GetEnvironmentVariable("GAME_STORE_CONNECTION_STRING");
 
+        gameStoreConnectionString = Environment.GetEnvironmentVariable("GAME_STORE_CONNECTION_STRING");
         if (string.IsNullOrEmpty(gameStoreConnectionString))
         {
             throw new InvalidOperationException("DATABASE_URL environment variable is not set.");
         }
-        // builder.Services.AddCors(options =>
-        // {
-        //     options.AddPolicy("AllowRenderOrigin",
-        //         policy =>
-        //         {
-        //             policy.WithOrigins("https://gamestoreweb.onrender.com")  // Use your actual frontend URL
-        //                 .AllowAnyMethod()
-        //                 .AllowAnyHeader()
-        //                 .AllowCredentials(); // Important for anti-forgery tokens
-        //         });
-        // });
+
+        jwtKey = Environment.GetEnvironmentVariable("JWT_AUTH_KEY");
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new InvalidOperationException("JWT_AUTH_KEY environment variable is not set.");
+        }
     }
 }
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddNpgsql<GameStoreContext>(gameStoreConnectionString);
 
@@ -54,6 +66,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapGamesEndpoints();
 app.MapGenresEndpoints();
 app.MapHealthEndpoints();
@@ -63,12 +77,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// else
-// {
-//     if (Environment.GetEnvironmentVariable("RENDER") != null)
-//         app.UseCors("AllowRenderOrigin"); // Enable the CORS policy
-// }
-// to Apply migrations use this custom Middleware below
 await app.MigrateDbAsync();
 
 app.Run();
