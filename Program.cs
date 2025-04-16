@@ -1,5 +1,4 @@
 using GameStore.Api.Data;
-using GameStore.Api.Dtos;
 using GameStore.Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,7 +58,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddNpgsql<GameStoreContext>(gameStoreConnectionString);
+// builder.Services.AddNpgsql<GameStoreContext>(gameStoreConnectionString);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -68,9 +67,9 @@ var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGamesEndpoints();
-app.MapGenresEndpoints();
-app.MapHealthEndpoints();
+// app.MapGamesEndpoints();
+// app.MapGenresEndpoints();
+// app.MapHealthEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
