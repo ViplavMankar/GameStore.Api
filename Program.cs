@@ -1,5 +1,4 @@
 using GameStore.Api.Data;
-using GameStore.Api.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
