@@ -20,5 +20,41 @@ public class GameStoreDbContext : DbContext
             .HasOne(x => x.Game)
             .WithMany()
             .HasForeignKey(x => x.GameId);
+
+        // 👇 Seed games
+        var now = DateTime.UtcNow;
+
+        modelBuilder.Entity<Game>().HasData(
+            new Game
+            {
+                Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), // use fixed Guids
+                Title = "Number Guesser",
+                Description = "Guess the number between 1 and 100",
+                GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
+                ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
+                AuthorUserId = Guid.Empty,
+                CreatedAt = now
+            },
+            new Game
+            {
+                Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                Title = "BMI Calculator",
+                Description = "Calculate your Body Mass Index (BMI)",
+                GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
+                ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
+                AuthorUserId = Guid.Empty,
+                CreatedAt = now
+            },
+            new Game
+            {
+                Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                Title = "Pong",
+                Description = "Play the classic Pong game",
+                GameUrl = "https://viplavmankar.github.io/Pong_Game/",
+                ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
+                AuthorUserId = Guid.Empty,
+                CreatedAt = now
+            }
+        );
     }
 }
