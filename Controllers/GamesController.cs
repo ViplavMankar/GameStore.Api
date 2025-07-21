@@ -29,4 +29,24 @@ public class GamesController : ControllerBase
         var game = await _service.CreateAsync(dto, userId);
         return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
     }
+
+    [HttpPut("Edit")]
+    [Authorize]
+    public async Task<IActionResult> Edit([FromBody] GameEditDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        Console.WriteLine("userId: " + userId);
+        var game = await _service.EditAsync(dto, userId);
+        return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
+    }
+
+    [HttpDelete("Delete/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        Console.WriteLine("userId: " + userId);
+        var game = await _service.DeleteAsync(id, userId);
+        return NoContent();
+    }
 }

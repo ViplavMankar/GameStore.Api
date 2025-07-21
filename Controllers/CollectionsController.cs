@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using GameStore.Api.DTOs;
 using GameStore.Api.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Controllers;
 
@@ -18,7 +19,8 @@ public class CollectionsController : ControllerBase
         _service = service;
     }
 
-    [HttpPost]
+    [HttpPost("Add")]
+    [Authorize]
     public async Task<IActionResult> Add(CollectionCreateDto dto)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -26,5 +28,16 @@ public class CollectionsController : ControllerBase
 
         if (!added) return Conflict("Already added");
         return Ok("Added to collection");
+    }
+
+    [HttpDelete("Remove/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Remove(Guid id)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var removed = await _service.RemoveFromCollectionAsync(id, userId);
+
+        if (!removed) return Conflict("No game found");
+        return Ok("Removed from Collection");
     }
 }

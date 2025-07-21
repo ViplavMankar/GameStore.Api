@@ -9,6 +9,7 @@ public class GameStoreDbContext : DbContext
 
     public DbSet<Game> Games { get; set; }
     public DbSet<UserCollection> UserCollections { get; set; }
+    public DbSet<GameRating> GameRatings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,6 +21,16 @@ public class GameStoreDbContext : DbContext
             .HasOne(x => x.Game)
             .WithMany()
             .HasForeignKey(x => x.GameId);
+
+        modelBuilder.Entity<GameRating>()
+            .HasIndex(x => new { x.UserId, x.GameId })
+            .IsUnique();
+
+        modelBuilder.Entity<GameRating>()
+            .HasOne(x => x.Game)
+            .WithMany()
+            .HasForeignKey(x => x.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // 👇 Seed games
         var now = DateTime.UtcNow;
@@ -33,7 +44,8 @@ public class GameStoreDbContext : DbContext
                 GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                 ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                 AuthorUserId = Guid.Empty,
-                CreatedAt = now
+                CreatedAt = now,
+                UpdatedAt = now
             },
             new Game
             {
@@ -43,7 +55,8 @@ public class GameStoreDbContext : DbContext
                 GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                 ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                 AuthorUserId = Guid.Empty,
-                CreatedAt = now
+                CreatedAt = now,
+                UpdatedAt = now
             },
             new Game
             {
@@ -53,7 +66,8 @@ public class GameStoreDbContext : DbContext
                 GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                 ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                 AuthorUserId = Guid.Empty,
-                CreatedAt = now
+                CreatedAt = now,
+                UpdatedAt = now
             }
         );
     }
