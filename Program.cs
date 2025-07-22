@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using GameStore.Api.Services;
 using Microsoft.OpenApi.Models;
+using GameStore.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +64,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<GameStoreDbContext>(options => options.UseNpgsql(gameStoreConnectionString));
 
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
