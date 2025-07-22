@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GameStore.Api.Migrations
 {
     [DbContext(typeof(GameStoreDbContext))]
-    [Migration("20250721074340_AddedUpdatedAtColumn")]
-    partial class AddedUpdatedAtColumn
+    [Migration("20250722072434_AddedGameRatingsTable")]
+    partial class AddedGameRatingsTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,35 +65,66 @@ namespace GameStore.Api.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Guess the number between 1 and 100",
                             GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                             Title = "Number Guesser",
-                            UpdatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Calculate your Body Mass Index (BMI)",
                             GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                             Title = "BMI Calculator",
-                            UpdatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Play the classic Pong game",
                             GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                             Title = "Pong",
-                            UpdatedAt = new DateTime(2025, 7, 21, 7, 43, 40, 523, DateTimeKind.Utc).AddTicks(9450)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         });
+                });
+
+            modelBuilder.Entity("GameStore.Api.Models.GameRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("UserId", "GameId")
+                        .IsUnique();
+
+                    b.ToTable("GameRatings");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.UserCollection", b =>
@@ -119,6 +150,17 @@ namespace GameStore.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("UserCollections");
+                });
+
+            modelBuilder.Entity("GameStore.Api.Models.GameRating", b =>
+                {
+                    b.HasOne("GameStore.Api.Models.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.UserCollection", b =>

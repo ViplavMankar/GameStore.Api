@@ -62,34 +62,34 @@ namespace GameStore.Api.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Guess the number between 1 and 100",
                             GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                             Title = "Number Guesser",
-                            UpdatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Calculate your Body Mass Index (BMI)",
                             GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                             Title = "BMI Calculator",
-                            UpdatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18),
+                            CreatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504),
                             Description = "Play the classic Pong game",
                             GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                             Title = "Pong",
-                            UpdatedAt = new DateTime(2025, 7, 21, 13, 8, 45, 578, DateTimeKind.Utc).AddTicks(18)
+                            UpdatedAt = new DateTime(2025, 7, 22, 7, 24, 33, 173, DateTimeKind.Utc).AddTicks(6504)
                         });
                 });
 
@@ -115,6 +115,8 @@ namespace GameStore.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameId");
 
                     b.HasIndex("UserId", "GameId")
                         .IsUnique();
@@ -151,7 +153,7 @@ namespace GameStore.Api.Migrations
                 {
                     b.HasOne("GameStore.Api.Models.Game", "Game")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
