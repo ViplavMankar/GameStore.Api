@@ -1,3 +1,5 @@
+using System;
+
 namespace GameStore.Api.DTOs;
 
 public class CollectionCreateDto
