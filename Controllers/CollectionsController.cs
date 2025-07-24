@@ -23,10 +23,10 @@ public class CollectionsController : ControllerBase
 
     [HttpPost("Add")]
     [Authorize]
-    public async Task<IActionResult> Add(CollectionCreateDto dto)
+    public async Task<IActionResult> Add([FromBody] CollectionCreateDto dto)
     {
-        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var added = await _collectionService.AddToCollectionAsync(userId, dto.GameId);
+        // var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var added = await _collectionService.AddToCollectionAsync(dto.UserId, dto.GameId);
 
         if (!added) return Conflict("Already added");
         return Ok("Added to collection");
@@ -48,7 +48,7 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> GetUserCollection()
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         var games = await _collectionService.GetUserCollectionAsync(userId);
         return Ok(games);
     }
@@ -57,7 +57,7 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> IsGameSaved(Guid gameId)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         bool isSaved = await _collectionService.IsGameSavedAsync(userId, gameId);
         return Ok(new { isSaved });
     }
