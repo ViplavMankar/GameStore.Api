@@ -104,34 +104,4 @@ public class GameService : IGameService
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public async Task<bool> AddToCollectionAsync(Guid userId, Guid gameId)
-    {
-        var exists = await _context.UserCollections
-            .AnyAsync(c => c.UserId == userId && c.GameId == gameId);
-
-        if (exists) return false;
-
-        _context.UserCollections.Add(new UserCollection
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            GameId = gameId
-        });
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> RemoveFromCollectionAsync(Guid id, Guid userId)
-    {
-        var collectionEntry = await _context.UserCollections.FirstOrDefaultAsync(c => c.UserId == userId && c.GameId == id);
-
-        if (collectionEntry == null) return false;
-
-        _context.UserCollections.Remove(collectionEntry);
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
 }

@@ -25,7 +25,7 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] GameCreateDto dto)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         var game = await _service.CreateAsync(dto, userId);
         return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
     }
@@ -35,7 +35,7 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> Edit([FromBody] GameEditDto dto)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         var game = await _service.EditAsync(dto, userId);
         return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
     }
@@ -45,7 +45,7 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         var game = await _service.DeleteAsync(id, userId);
         return NoContent();
     }

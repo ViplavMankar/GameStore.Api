@@ -64,6 +64,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<GameStoreDbContext>(options => options.UseNpgsql(gameStoreConnectionString));
 
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 
 builder.Services.AddEndpointsApiExplorer();
