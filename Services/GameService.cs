@@ -56,9 +56,9 @@ public class GameService : IGameService
         };
     }
 
-    public async Task<GameReadDto> EditAsync(GameEditDto dto, Guid authorId)
+    public async Task<GameReadDto> EditAsync(Guid id, GameEditDto dto, Guid authorId)
     {
-        var game = await _context.Games.FindAsync(dto.Id);
+        var game = await _context.Games.FindAsync(id);
         if (game == null)
         {
             throw new KeyNotFoundException("Game Not Found");
@@ -98,10 +98,43 @@ public class GameService : IGameService
         }
         if (game.AuthorUserId != authorId)
         {
-            throw new UnauthorizedAccessException("You are not allowed to edit this game!");
+            throw new UnauthorizedAccessException("You are not allowed to delete this game!");
         }
         _context.Games.Remove(game);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<IEnumerable<GameReadDto>> GetMyGamesAsync(Guid userId)
+    {
+        return await _context.Games
+                            .Where(g => g.AuthorUserId == userId)
+                            .Select(g => new GameReadDto
+                            {
+                                Id = g.Id,
+                                Title = g.Title,
+                                Description = g.Description,
+                                GameUrl = g.GameUrl,
+                                ThumbnailUrl = g.ThumbnailUrl,
+                                AuthorUserId = g.AuthorUserId,
+                                CreatedAt = g.CreatedAt
+                            }).ToListAsync();
+
+    }
+
+    public async Task<GameReadDto?> GetMySingleGameAsync(Guid userId, Guid gameId)
+    {
+        return await _context.Games
+                            .Where(g => g.AuthorUserId == userId && g.Id == gameId)
+                            .Select(g => new GameReadDto
+                            {
+                                Id = g.Id,
+                                Title = g.Title,
+                                Description = g.Description,
+                                GameUrl = g.GameUrl,
+                                ThumbnailUrl = g.ThumbnailUrl,
+                                AuthorUserId = g.AuthorUserId,
+                                CreatedAt = g.CreatedAt
+                            }).FirstOrDefaultAsync();
     }
 }
