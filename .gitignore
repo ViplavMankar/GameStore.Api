@@ -489,3 +489,6 @@ $RECYCLE.BIN/
 GameStore.db
 *.db-shm
 *.db-wal
+
+appsettings.Development.json
+run-https.sh
