@@ -25,8 +25,49 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> Create([FromBody] GameCreateDto dto)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        Console.WriteLine("userId: " + userId);
+        // Console.WriteLine("userId: " + userId);
         var game = await _service.CreateAsync(dto, userId);
         return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
+    }
+
+    [HttpPut("Edit/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Edit([FromBody] GameEditDto dto, Guid id)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        // Console.WriteLine("userId: " + userId);
+        var game = await _service.EditAsync(id, dto, userId);
+        return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
+    }
+
+    [HttpDelete("Delete/{id}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        // Console.WriteLine("userId: " + userId);
+        var game = await _service.DeleteAsync(id, userId);
+        return NoContent();
+    }
+
+    [HttpGet("Mine")]
+    [Authorize]
+    public async Task<IActionResult> GetMyGames()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Ok(await _service.GetMyGamesAsync(userId));
+    }
+
+    [HttpGet("Mine/{id}")]
+    [Authorize]
+    public async Task<IActionResult> GetMySingleGame(Guid id)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var game = await _service.GetMySingleGameAsync(userId, id);
+
+        if (game == null)
+            return NotFound(new { message = "Game not found or you are not authorized to access it." });
+
+        return Ok(game);
     }
 }

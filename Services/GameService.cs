@@ -40,7 +40,6 @@ public class GameService : IGameService
             GameUrl = dto.GameUrl,
             AuthorUserId = authorId,
         };
-
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
 
@@ -52,25 +51,90 @@ public class GameService : IGameService
             GameUrl = game.GameUrl,
             ThumbnailUrl = game.ThumbnailUrl,
             AuthorUserId = game.AuthorUserId,
-            CreatedAt = game.CreatedAt
+            CreatedAt = game.CreatedAt,
+            UpdatedAt = game.UpdatedAt
         };
     }
 
-    public async Task<bool> AddToCollectionAsync(Guid userId, Guid gameId)
+    public async Task<GameReadDto> EditAsync(Guid id, GameEditDto dto, Guid authorId)
     {
-        var exists = await _context.UserCollections
-            .AnyAsync(c => c.UserId == userId && c.GameId == gameId);
-
-        if (exists) return false;
-
-        _context.UserCollections.Add(new UserCollection
+        var game = await _context.Games.FindAsync(id);
+        if (game == null)
         {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            GameId = gameId
-        });
+            throw new KeyNotFoundException("Game Not Found");
+        }
+        if (game.AuthorUserId != authorId)
+        {
+            throw new UnauthorizedAccessException("You are not allowed to edit this game!");
+        }
+        game.Title = dto.Title ?? game.Title;
+        game.ThumbnailUrl = dto.ThumbnailUrl ?? game.ThumbnailUrl;
+        game.Description = dto.Description ?? game.Description;
+        game.GameUrl = dto.GameUrl ?? game.GameUrl;
+
+        game.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        return new GameReadDto
+        {
+            Id = game.Id,
+            Title = game.Title,
+            Description = game.Description,
+            ThumbnailUrl = game.ThumbnailUrl,
+            GameUrl = game.GameUrl,
+            AuthorUserId = game.AuthorUserId,
+            CreatedAt = game.CreatedAt,
+            UpdatedAt = game.UpdatedAt,
+        };
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, Guid authorId)
+    {
+        var game = await _context.Games.FindAsync(id);
+        if (game == null)
+        {
+            return false;
+        }
+        if (game.AuthorUserId != authorId)
+        {
+            throw new UnauthorizedAccessException("You are not allowed to delete this game!");
+        }
+        _context.Games.Remove(game);
+        await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<IEnumerable<GameReadDto>> GetMyGamesAsync(Guid userId)
+    {
+        return await _context.Games
+                            .Where(g => g.AuthorUserId == userId)
+                            .Select(g => new GameReadDto
+                            {
+                                Id = g.Id,
+                                Title = g.Title,
+                                Description = g.Description,
+                                GameUrl = g.GameUrl,
+                                ThumbnailUrl = g.ThumbnailUrl,
+                                AuthorUserId = g.AuthorUserId,
+                                CreatedAt = g.CreatedAt
+                            }).ToListAsync();
+
+    }
+
+    public async Task<GameReadDto?> GetMySingleGameAsync(Guid userId, Guid gameId)
+    {
+        return await _context.Games
+                            .Where(g => g.AuthorUserId == userId && g.Id == gameId)
+                            .Select(g => new GameReadDto
+                            {
+                                Id = g.Id,
+                                Title = g.Title,
+                                Description = g.Description,
+                                GameUrl = g.GameUrl,
+                                ThumbnailUrl = g.ThumbnailUrl,
+                                AuthorUserId = g.AuthorUserId,
+                                CreatedAt = g.CreatedAt
+                            }).FirstOrDefaultAsync();
     }
 }
