@@ -10,9 +10,11 @@ public class GameStoreDbContext : DbContext
     public DbSet<Game> Games { get; set; }
     public DbSet<UserCollection> UserCollections { get; set; }
     public DbSet<GameRating> GameRatings { get; set; }
+    public DbSet<Blog> Blogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<UserCollection>()
             .HasIndex(x => new { x.UserId, x.GameId })
             .IsUnique();
@@ -31,6 +33,15 @@ public class GameStoreDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.GameId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Blog>(entity =>
+        {
+            entity.Property(b => b.Title).HasColumnType("text");
+            entity.Property(b => b.Content).HasColumnType("text");
+            entity.Property(b => b.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAddOrUpdate();
+        });
 
         // 👇 Seed games
         var now = DateTime.UtcNow;
