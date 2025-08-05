@@ -44,6 +44,25 @@ public class BlogService : IBlogService
         return result;
     }
 
+    public async Task<BlogReadUserDto?> GetByIdWithUsernameAsync(Guid id)
+    {
+        var blog = await _context.Blogs.FindAsync(id);
+        if (blog == null) return null;
+
+        var username = await ResolveUsernameAsync(blog.AuthorUserId);
+
+        return new BlogReadUserDto
+        {
+            Id = blog.Id,
+            Title = blog.Title,
+            Content = blog.Content,
+            AuthorUserId = blog.AuthorUserId,
+            AuthorUsername = username,
+            CreatedAt = blog.CreatedAt,
+            UpdatedAt = blog.UpdatedAt
+        };
+    }
+
     public async Task<BlogReadDto> CreateAsync(BlogCreateDto dto, Guid authorId)
     {
         var blog = new Blog
@@ -112,19 +131,31 @@ public class BlogService : IBlogService
         return true;
     }
 
-    public async Task<IEnumerable<BlogReadDto>> GetMyBlogsAsync(Guid userId)
+    public async Task<IEnumerable<BlogReadUserDto>> GetMyBlogsAsync(Guid userId)
     {
-        return await _context.Blogs
-                            .Where(b => b.AuthorUserId == userId)
-                            .Select(b => new BlogReadDto
-                            {
-                                Id = b.Id,
-                                Title = b.Title,
-                                Content = b.Content,
-                                AuthorUserId = b.AuthorUserId,
-                                CreatedAt = b.CreatedAt
-                            }).ToListAsync();
+        var blogs = await _context.Blogs
+            .Where(b => b.AuthorUserId == userId)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync();
 
+        var result = new List<BlogReadUserDto>();
+
+        var username = await ResolveUsernameAsync(userId);
+
+        foreach (var blog in blogs)
+        {
+            result.Add(new BlogReadUserDto
+            {
+                Id = blog.Id,
+                Title = blog.Title,
+                Content = blog.Content,
+                AuthorUserId = blog.AuthorUserId,
+                AuthorUsername = username,
+                CreatedAt = blog.CreatedAt,
+                UpdatedAt = blog.UpdatedAt
+            });
+        }
+        return result;
     }
 
     public async Task<BlogReadDto?> GetMySingleBlogAsync(Guid userId, Guid blogId)
