@@ -20,6 +20,14 @@ public class GamesController : ControllerBase
     [HttpGet("GetAll")]
     public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
 
+    [HttpGet("Get/{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var blog = await _service.GetByIdWithUsernameAsync(id);
+        if (blog is null) return NotFound();
+        return Ok(blog);
+    }
+
     [HttpPost("Create")]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] GameCreateDto dto)

@@ -81,6 +81,7 @@ builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
