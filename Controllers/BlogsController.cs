@@ -1,18 +1,19 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using GameStore.Api.DTOs;
 using GameStore.Api.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GamesController : ControllerBase
+public class BlogsController : ControllerBase
 {
-    private readonly IGameService _service;
+    private readonly IBlogService _service;
 
-    public GamesController(IGameService service)
+    public BlogsController(IBlogService service, IHttpClientFactory httpClientFactory)
     {
         _service = service;
     }
@@ -30,22 +31,22 @@ public class GamesController : ControllerBase
 
     [HttpPost("Create")]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] GameCreateDto dto)
+    public async Task<IActionResult> Create([FromBody] BlogCreateDto dto)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         // Console.WriteLine("userId: " + userId);
-        var game = await _service.CreateAsync(dto, userId);
-        return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
+        var blog = await _service.CreateAsync(dto, userId);
+        return CreatedAtAction(nameof(GetAll), new { id = blog.Id }, blog);
     }
 
     [HttpPut("Edit/{id}")]
     [Authorize]
-    public async Task<IActionResult> Edit([FromBody] GameEditDto dto, Guid id)
+    public async Task<IActionResult> Edit([FromBody] BlogEditDto dto, Guid id)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         // Console.WriteLine("userId: " + userId);
-        var game = await _service.EditAsync(id, dto, userId);
-        return CreatedAtAction(nameof(GetAll), new { id = game.Id }, game);
+        var blog = await _service.EditAsync(id, dto, userId);
+        return CreatedAtAction(nameof(GetAll), new { id = blog.Id }, blog);
     }
 
     [HttpDelete("Delete/{id}")]
@@ -54,28 +55,28 @@ public class GamesController : ControllerBase
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         // Console.WriteLine("userId: " + userId);
-        var game = await _service.DeleteAsync(id, userId);
+        var blog = await _service.DeleteAsync(id, userId);
         return NoContent();
     }
 
     [HttpGet("Mine")]
     [Authorize]
-    public async Task<IActionResult> GetMyGames()
+    public async Task<IActionResult> GetMyBlogs()
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return Ok(await _service.GetMyGamesAsync(userId));
+        return Ok(await _service.GetMyBlogsAsync(userId));
     }
 
     [HttpGet("Mine/{id}")]
     [Authorize]
-    public async Task<IActionResult> GetMySingleGame(Guid id)
+    public async Task<IActionResult> GetMySingleBlog(Guid id)
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var game = await _service.GetMySingleGameAsync(userId, id);
+        var blog = await _service.GetMySingleBlogAsync(userId, id);
 
-        if (game == null)
-            return NotFound(new { message = "Game not found or you are not authorized to access it." });
+        if (blog == null)
+            return NotFound(new { message = "Blog not found or you are not authorized to access it." });
 
-        return Ok(game);
+        return Ok(blog);
     }
 }

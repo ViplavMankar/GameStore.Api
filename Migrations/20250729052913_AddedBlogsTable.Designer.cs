@@ -3,6 +3,7 @@ using System;
 using GameStore.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GameStore.Api.Migrations
 {
     [DbContext(typeof(GameStoreDbContext))]
-    partial class GameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250729052913_AddedBlogsTable")]
+    partial class AddedBlogsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,83 +95,35 @@ namespace GameStore.Api.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878),
+                            CreatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468),
                             Description = "Guess the number between 1 and 100",
                             GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                             Title = "Number Guesser",
-                            UpdatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878)
+                            UpdatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468)
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878),
+                            CreatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468),
                             Description = "Calculate your Body Mass Index (BMI)",
                             GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                             Title = "BMI Calculator",
-                            UpdatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878)
+                            UpdatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468)
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878),
+                            CreatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468),
                             Description = "Play the classic Pong game",
                             GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                             Title = "Pong",
-                            UpdatedAt = new DateTime(2025, 8, 15, 12, 38, 25, 138, DateTimeKind.Utc).AddTicks(878)
+                            UpdatedAt = new DateTime(2025, 7, 29, 5, 29, 12, 56, DateTimeKind.Utc).AddTicks(1468)
                         });
-                });
-
-            modelBuilder.Entity("GameStore.Api.Models.GamePrice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)");
-
-                    b.Property<DateTimeOffset>("EffectiveFrom")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset?>("EffectiveTo")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<long>("PricePaise")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.HasIndex("GameId", "Currency");
-
-                    b.HasIndex("GameId", "Currency", "IsActive")
-                        .IsUnique()
-                        .HasFilter("\"IsActive\" = TRUE");
-
-                    b.ToTable("GamePrices");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.GameRating", b =>
@@ -227,17 +182,6 @@ namespace GameStore.Api.Migrations
                     b.ToTable("UserCollections");
                 });
 
-            modelBuilder.Entity("GameStore.Api.Models.GamePrice", b =>
-                {
-                    b.HasOne("GameStore.Api.Models.Game", "Game")
-                        .WithMany("Prices")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Game");
-                });
-
             modelBuilder.Entity("GameStore.Api.Models.GameRating", b =>
                 {
                     b.HasOne("GameStore.Api.Models.Game", "Game")
@@ -258,11 +202,6 @@ namespace GameStore.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
-                });
-
-            modelBuilder.Entity("GameStore.Api.Models.Game", b =>
-                {
-                    b.Navigation("Prices");
                 });
 #pragma warning restore 612, 618
         }

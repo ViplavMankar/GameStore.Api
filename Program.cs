@@ -24,6 +24,14 @@ if (builder.Environment.IsDevelopment())
     {
         throw new InvalidOperationException("jwtkey appsetting value not set.");
     }
+    builder.Services.AddHttpClient("AuthService", client =>
+    {
+        client.BaseAddress = new Uri("https://localhost:7168/");
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+    });
 }
 else
 {
@@ -43,6 +51,12 @@ else
         {
             throw new InvalidOperationException("JWT_AUTH_KEY environment variable is not set.");
         }
+        builder.Services.AddHttpClient("AuthService", client =>
+        {
+            client.BaseAddress = Environment.GetEnvironmentVariable("AUTH_SERVICE_URL") != null
+                ? new Uri(Environment.GetEnvironmentVariable("AUTH_SERVICE_URL"))
+                : throw new Exception("Environment variable not set.");
+        });
     }
 }
 builder.Services.AddControllers();
@@ -66,6 +80,8 @@ builder.Services.AddDbContext<GameStoreDbContext>(options => options.UseNpgsql(g
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
