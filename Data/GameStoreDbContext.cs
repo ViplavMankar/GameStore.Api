@@ -11,6 +11,7 @@ public class GameStoreDbContext : DbContext
     public DbSet<UserCollection> UserCollections { get; set; }
     public DbSet<GameRating> GameRatings { get; set; }
     public DbSet<Blog> Blogs { get; set; }
+    public DbSet<GamePrice> GamePrices => Set<GamePrice>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,6 +42,42 @@ public class GameStoreDbContext : DbContext
             entity.Property(b => b.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAddOrUpdate();
+        });
+
+        modelBuilder.Entity<Game>(e =>
+        {
+            e.HasKey(g => g.Id);
+            e.HasMany(g => g.Prices)
+             .WithOne(p => p.Game)
+             .HasForeignKey(p => p.GameId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GamePrice>(e =>
+        {
+            e.HasKey(p => p.Id);
+
+            e.Property(p => p.Currency)
+             .HasMaxLength(3)
+             .IsRequired();
+
+            e.Property(p => p.PricePaise)
+             .IsRequired();
+
+            e.Property(p => p.IsActive)
+             .HasDefaultValue(true);
+
+            e.Property(p => p.CreatedUtc)
+             .HasDefaultValueSql("now()");
+
+            e.HasIndex(p => p.GameId);
+            e.HasIndex(p => new { p.GameId, p.Currency });
+
+            // Allow only ONE active price per game/currency
+            // Postgres filtered unique index
+            e.HasIndex(p => new { p.GameId, p.Currency, p.IsActive })
+             .IsUnique()
+             .HasFilter("\"IsActive\" = TRUE");
         });
 
         // 👇 Seed games

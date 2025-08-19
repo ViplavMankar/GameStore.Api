@@ -8,10 +8,12 @@ namespace GameStore.Api.Services;
 public class GameService : IGameService
 {
     private readonly GameStoreDbContext _context;
+    private readonly HttpClient _authClient;
 
-    public GameService(GameStoreDbContext context)
+    public GameService(GameStoreDbContext context, IHttpClientFactory httpClientFactory)
     {
         _context = context;
+        _authClient = httpClientFactory.CreateClient("AuthService");
     }
 
     public async Task<IEnumerable<GameReadDto>> GetAllAsync()
@@ -27,6 +29,27 @@ public class GameService : IGameService
                 AuthorUserId = g.AuthorUserId,
                 CreatedAt = g.CreatedAt
             }).ToListAsync();
+    }
+
+    public async Task<GameReadUserDto?> GetByIdWithUsernameAsync(Guid id)
+    {
+        var game = await _context.Games.FindAsync(id);
+        if (game == null) return null;
+
+        var username = await ResolveUsernameAsync(game.AuthorUserId);
+
+        return new GameReadUserDto
+        {
+            Id = game.Id,
+            Title = game.Title,
+            Description = game.Description,
+            ThumbnailUrl = game.ThumbnailUrl,
+            GameUrl = game.GameUrl,
+            AuthorUserId = game.AuthorUserId,
+            AuthorUsername = username,
+            CreatedAt = game.CreatedAt,
+            UpdatedAt = game.UpdatedAt
+        };
     }
 
     public async Task<GameReadDto> CreateAsync(GameCreateDto dto, Guid authorId)
@@ -136,5 +159,31 @@ public class GameService : IGameService
                                 AuthorUserId = g.AuthorUserId,
                                 CreatedAt = g.CreatedAt
                             }).FirstOrDefaultAsync();
+    }
+
+    private async Task<string?> ResolveUsernameAsync(Guid? userId)
+    {
+        if (userId == null)
+        {
+            return "Anonymous";
+        }
+        try
+        {
+            var response = await _authClient.GetAsync($"api/users/{userId.ToString()}");
+            if (!response.IsSuccessStatusCode)
+                return "Unknown";
+
+            var user = await response.Content.ReadFromJsonAsync<UserReadDto>();
+            return user?.Username ?? "Unknown";
+        }
+        catch
+        {
+            return "Unknown";
+        }
+    }
+    private class UserReadDto
+    {
+        public string Id { get; set; }
+        public string Username { get; set; } = string.Empty;
     }
 }

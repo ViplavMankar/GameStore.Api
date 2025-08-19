@@ -11,4 +11,6 @@ public class Game
     public Guid AuthorUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public ICollection<GamePrice> Prices { get; set; } = new List<GamePrice>();
 }
