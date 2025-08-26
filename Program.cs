@@ -5,12 +5,30 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using GameStore.Api.Services;
 using Microsoft.OpenApi.Models;
-using GameStore.Api.Models;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var gameStoreConnectionString = string.Empty;
 var jwtKey = string.Empty;
+
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+
+// Typed HttpClient for Google AI Studio (Gemini)
+builder.Services.AddHttpClient<GeminiApiClient>((sp, http) =>
+{
+    var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GeminiOptions>>().Value;
+
+    http.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+    // AI Studio keys authenticate with an API key; using header keeps URLs clean.
+    http.DefaultRequestHeaders.Add("x-goog-api-key", opts.ApiKey);
+    http.DefaultRequestHeaders.Accept.Add(
+        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+    http.Timeout = TimeSpan.FromSeconds(120);
+});
+
+// Your existing app service that calls the client
+builder.Services.AddScoped<AiRewriteService>();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -82,6 +100,7 @@ builder.Services.AddScoped<ICollectionService, CollectionService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<IAiRewriteService, AiRewriteService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
