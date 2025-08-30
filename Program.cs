@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using GameStore.Api.Services;
+using GameStore.Api.DTOs;
 using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
 
@@ -27,8 +28,21 @@ builder.Services.AddHttpClient<GeminiApiClient>((sp, http) =>
     http.Timeout = TimeSpan.FromSeconds(120);
 });
 
+builder.Services.Configure<AwsSettings>(
+    builder.Configuration.GetSection("AWS"));
+
 // Your existing app service that calls the client
 builder.Services.AddScoped<AiRewriteService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowGameStoreWeb",
+        policy => policy
+            .WithOrigins("https://localhost:7051") // your Blazor URL
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
 
 if (builder.Environment.IsDevelopment())
 {
@@ -101,6 +115,7 @@ builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IAiRewriteService, AiRewriteService>();
+builder.Services.AddScoped<IS3Service, S3Service>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -132,6 +147,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowGameStoreWeb");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
