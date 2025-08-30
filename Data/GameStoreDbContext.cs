@@ -12,6 +12,7 @@ public class GameStoreDbContext : DbContext
     public DbSet<GameRating> GameRatings { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<GamePrice> GamePrices => Set<GamePrice>();
+    public DbSet<GameSession> GameSessions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,6 +79,19 @@ public class GameStoreDbContext : DbContext
             e.HasIndex(p => new { p.GameId, p.Currency, p.IsActive })
              .IsUnique()
              .HasFilter("\"IsActive\" = TRUE");
+        });
+
+        modelBuilder.Entity<GameSession>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+
+            entity.Property(s => s.UserId)
+                .IsRequired();
+
+            entity.HasOne(s => s.Game)
+                .WithMany() // or .WithMany(g => g.Sessions) if you add a collection in Game
+                .HasForeignKey(s => s.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // 👇 Seed games
