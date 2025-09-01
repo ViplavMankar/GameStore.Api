@@ -11,10 +11,12 @@ namespace GameStore.Api.Controllers;
 public class GamesController : ControllerBase
 {
     private readonly IGameService _service;
+    private readonly IS3Service _s3Service;
 
-    public GamesController(IGameService service)
+    public GamesController(IGameService service, IS3Service s3Service)
     {
         _service = service;
+        _s3Service = s3Service;
     }
 
     [HttpGet("GetAll")]
@@ -54,7 +56,18 @@ public class GamesController : ControllerBase
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         // Console.WriteLine("userId: " + userId);
-        var game = await _service.DeleteAsync(id, userId);
+        // 1️⃣ Fetch the game from the database
+        var game = await _service.GetByIdWithUsernameAsync(id);
+        if (game == null)
+            return NotFound("Game not found.");
+
+        // 2️⃣ Delete the game files from S3
+        if (!string.IsNullOrWhiteSpace(game.Title))
+        {
+            // assuming the S3 folder name is the same as the game title
+            await _s3Service.DeleteFolderAsync(game.Title);
+        }
+        var gameBool = await _service.DeleteAsync(id, userId);
         return NoContent();
     }
 
