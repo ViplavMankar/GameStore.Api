@@ -166,6 +166,8 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IAiRewriteService, AiRewriteService>();
 builder.Services.AddScoped<IS3Service, S3Service>();
+builder.Services.AddScoped<ITrendingGameService, TrendingGameService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
