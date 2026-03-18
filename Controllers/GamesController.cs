@@ -25,9 +25,9 @@ public class GamesController : ControllerBase
     [HttpGet("Get/{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var blog = await _service.GetByIdWithUsernameAsync(id);
-        if (blog is null) return NotFound();
-        return Ok(blog);
+        var game = await _service.GetByIdWithUsernameAsync(id);
+        if (game is null) return NotFound();
+        return Ok(game);
     }
 
     [HttpPost("Create")]
