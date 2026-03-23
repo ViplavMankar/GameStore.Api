@@ -3,6 +3,7 @@ using System;
 using GameStore.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GameStore.Api.Migrations
 {
     [DbContext(typeof(GameStoreDbContext))]
-    partial class GameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260322091446_AddedChallengesAndXPConstraints")]
+    partial class AddedChallengesAndXPConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,34 +182,34 @@ namespace GameStore.Api.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943),
                             Description = "Guess the number between 1 and 100",
                             GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                             Title = "Number Guesser",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943)
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943),
                             Description = "Calculate your Body Mass Index (BMI)",
                             GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                             Title = "BMI Calculator",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943)
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943),
                             Description = "Play the classic Pong game",
                             GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                             Title = "Pong",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 22, 9, 14, 44, 839, DateTimeKind.Utc).AddTicks(8943)
                         });
                 });
 
@@ -420,7 +423,7 @@ namespace GameStore.Api.Migrations
                     b.HasIndex("UserId", "ChallengeId")
                         .IsUnique();
 
-                    b.ToTable("UserDailyChallengeProgresses");
+                    b.ToTable("UserDailyChallengeProgress");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.UserStats", b =>

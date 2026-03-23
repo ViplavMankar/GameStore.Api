@@ -166,6 +166,12 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPricingService, PricingService>();
 builder.Services.AddScoped<IAiRewriteService, AiRewriteService>();
 builder.Services.AddScoped<IS3Service, S3Service>();
+builder.Services.AddScoped<ITrendingGameService, TrendingGameService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
+builder.Services.AddScoped<IUserStatisticsService, UserStatisticsService>();
+builder.Services.AddHostedService<LeaderboardBackgroundService>();
+builder.Services.AddHostedService<DailyChallengeGeneratorService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

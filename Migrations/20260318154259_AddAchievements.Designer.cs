@@ -3,6 +3,7 @@ using System;
 using GameStore.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GameStore.Api.Migrations
 {
     [DbContext(typeof(GameStoreDbContext))]
-    partial class GameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260318154259_AddAchievements")]
+    partial class AddAchievements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,35 +53,6 @@ namespace GameStore.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Achievements");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            ConditionType = "Sessions",
-                            Description = "Play your first game",
-                            Icon = "/icons/first.png",
-                            Name = "First Game",
-                            TargetValue = 1
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            ConditionType = "Sessions",
-                            Description = "Play 5 sessions",
-                            Icon = "/icons/five.png",
-                            Name = "Getting Started",
-                            TargetValue = 5
-                        },
-                        new
-                        {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            ConditionType = "PlayTime",
-                            Description = "Play for 60 minutes",
-                            Icon = "/icons/hour.png",
-                            Name = "1 Hour Gamer",
-                            TargetValue = 60
-                        });
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.Blog", b =>
@@ -109,34 +83,6 @@ namespace GameStore.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Blogs");
-                });
-
-            modelBuilder.Entity("GameStore.Api.Models.DailyChallenge", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TargetValue")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("XPReward")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DailyChallenges");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.Game", b =>
@@ -179,34 +125,34 @@ namespace GameStore.Api.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059),
                             Description = "Guess the number between 1 and 100",
                             GameUrl = "https://viplavmankar.github.io/Number-Guesser/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Number-Guesser/blob/main/Images/Number%20Guesser.png?raw=true",
                             Title = "Number Guesser",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059)
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059),
                             Description = "Calculate your Body Mass Index (BMI)",
                             GameUrl = "https://viplavmankar.github.io/BMI-Calculator/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/BMI-Calculator/blob/main/Screenshot%20from%202025-06-13%2013-07-58.png?raw=true",
                             Title = "BMI Calculator",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059)
                         },
                         new
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             AuthorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            CreatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405),
+                            CreatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059),
                             Description = "Play the classic Pong game",
                             GameUrl = "https://viplavmankar.github.io/Pong_Game/",
                             ThumbnailUrl = "https://github.com/ViplavMankar/Pong_Game/blob/main/Screenshot%20from%202025-06-14%2011-45-30.png?raw=true",
                             Title = "Pong",
-                            UpdatedAt = new DateTime(2026, 3, 22, 13, 16, 34, 847, DateTimeKind.Utc).AddTicks(6405)
+                            UpdatedAt = new DateTime(2026, 3, 18, 15, 42, 58, 556, DateTimeKind.Utc).AddTicks(1059)
                         });
                 });
 
@@ -317,33 +263,6 @@ namespace GameStore.Api.Migrations
                     b.ToTable("GameSessions");
                 });
 
-            modelBuilder.Entity("GameStore.Api.Models.LeaderboardEntry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Rank")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalPlayTimeSeconds")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LeaderboardEntries");
-                });
-
             modelBuilder.Entity("GameStore.Api.Models.UserAchievement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -392,70 +311,6 @@ namespace GameStore.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("UserCollections");
-                });
-
-            modelBuilder.Entity("GameStore.Api.Models.UserDailyChallengeProgress", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChallengeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CurrentProgress")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "ChallengeId")
-                        .IsUnique();
-
-                    b.ToTable("UserDailyChallengeProgresses");
-                });
-
-            modelBuilder.Entity("GameStore.Api.Models.UserStats", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("GamesPlayed")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("LastPlayedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("SessionsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalPurchases")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalSecondsPlayed")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TotalXP")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserStatistics");
                 });
 
             modelBuilder.Entity("GameStore.Api.Models.GamePrice", b =>
