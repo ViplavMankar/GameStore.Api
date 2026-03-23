@@ -13,6 +13,12 @@ public class GameStoreDbContext : DbContext
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<GamePrice> GamePrices => Set<GamePrice>();
     public DbSet<GameSession> GameSessions { get; set; }
+    public DbSet<Achievement> Achievements { get; set; }
+    public DbSet<UserAchievement> UserAchievements { get; set; }
+    public DbSet<UserStats> UserStatistics { get; set; }
+    public DbSet<LeaderboardEntry> LeaderboardEntries { get; set; }
+    public DbSet<DailyChallenge> DailyChallenges { get; set; }
+    public DbSet<UserDailyChallengeProgress> UserDailyChallengeProgresses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -132,5 +138,58 @@ public class GameStoreDbContext : DbContext
                 UpdatedAt = now
             }
         );
+
+        modelBuilder.Entity<UserAchievement>()
+        .HasOne(ua => ua.Achievement)
+        .WithMany(a => a.UserAchievements)
+        .HasForeignKey(ua => ua.AchievementId);
+
+        modelBuilder.Entity<UserAchievement>()
+            .HasIndex(ua => new { ua.UserId, ua.AchievementId })
+            .IsUnique(); // Prevent duplicate unlocks
+
+        modelBuilder.Entity<Achievement>().HasData(
+            new Achievement
+            {
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                Name = "First Game",
+                Description = "Play your first game",
+                Icon = "/icons/first.png",
+                ConditionType = "Sessions",
+                TargetValue = 1
+            },
+            new Achievement
+            {
+                Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                Name = "Getting Started",
+                Description = "Play 5 sessions",
+                Icon = "/icons/five.png",
+                ConditionType = "Sessions",
+                TargetValue = 5
+            },
+            new Achievement
+            {
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                Name = "1 Hour Gamer",
+                Description = "Play for 60 minutes",
+                Icon = "/icons/hour.png",
+                ConditionType = "PlayTime",
+                TargetValue = 60
+            }
+        );
+        modelBuilder.Entity<UserStats>()
+        .HasIndex(u => u.UserId)
+        .IsUnique();
+        modelBuilder.Entity<LeaderboardEntry>(entity =>
+        {
+            entity.HasKey(l => l.Id);
+        });
+        modelBuilder.Entity<DailyChallenge>(entity =>
+        {
+            entity.HasKey(d => d.Id);
+        });
+        modelBuilder.Entity<UserDailyChallengeProgress>()
+        .HasIndex(x => new { x.UserId, x.ChallengeId })
+        .IsUnique();
     }
 }
