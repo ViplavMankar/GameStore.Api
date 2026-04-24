@@ -6,6 +6,8 @@ using System.Security.Claims;
 using GameStore.Api.DTOs;
 using Microsoft.EntityFrameworkCore;
 using GameStore.Api.Services;
+using Microsoft.AspNetCore.SignalR;
+using GameStore.Api.Hubs;
 
 namespace GameStore.Api.Controllers
 {
@@ -17,12 +19,20 @@ namespace GameStore.Api.Controllers
         private readonly IUserStatisticsService _userStatsService;
         private readonly IAchievementService _achievementService;
         private readonly HttpClient _authClient;
+        private readonly StreakService _streakService;
+        private readonly IHubContext<RealtimeHub> _hub;
 
-        public SessionsController(GameStoreDbContext db, IUserStatisticsService userStatsService, IAchievementService achievementService)
+        public SessionsController(GameStoreDbContext db,
+                                IUserStatisticsService userStatsService,
+                                IAchievementService achievementService,
+                                StreakService streakService,
+                                IHubContext<RealtimeHub> hub)
         {
             _db = db;
             _userStatsService = userStatsService;
             _achievementService = achievementService;
+            _streakService = streakService;
+            _hub = hub;
         }
 
         [HttpPost("start-session")]
@@ -121,6 +131,19 @@ namespace GameStore.Api.Controllers
             }
 
             await _db.SaveChangesAsync();
+
+            var streakResult = await _streakService.UpdateStreakAsync(session.UserId);
+
+            if (streakResult.UpdatedToday)
+            {
+                await _hub.Clients
+                    .User(session.UserId.ToString())
+                    .SendAsync("StreakUpdated", new
+                    {
+                        current = streakResult.Streak.CurrentStreak,
+                        max = streakResult.Streak.MaxStreak
+                    });
+            }
 
             // 🔥 STEP 1: Update UserStats
             await _userStatsService.UpdateAfterSessionAsync(session.UserId, session.GameId, (int)duration.Value.TotalSeconds);

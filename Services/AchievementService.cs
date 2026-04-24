@@ -3,16 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using GameStore.Api.Data;
 using GameStore.Api.Models;
 using GameStore.Api.DTOs;
+using Microsoft.AspNetCore.SignalR;
+using GameStore.Api.Hubs;
 
 namespace GameStore.Api.Services;
 
 public class AchievementService : IAchievementService
 {
     private readonly GameStoreDbContext _context;
+    private readonly IHubContext<RealtimeHub> _hub;
 
-    public AchievementService(GameStoreDbContext context)
+    public AchievementService(GameStoreDbContext context, IHubContext<RealtimeHub> hub)
     {
         _context = context;
+        _hub = hub;
     }
 
     public async Task<List<AchievementUnlockedDto>> EvaluateAchievementsAsync(Guid userId)
@@ -50,6 +54,20 @@ public class AchievementService : IAchievementService
 
             _context.UserAchievements.AddRange(userAchievements);
             await _context.SaveChangesAsync();
+
+            foreach (var achievement in newlyUnlocked)
+            {
+                var dto = new AchievementUnlockedDto
+                {
+                    Id = achievement.Id,
+                    Name = achievement.Name,
+                    Description = achievement.Description
+                };
+
+                await _hub.Clients.User(userId.ToString())
+                    .SendAsync("AchievementUnlocked", dto);
+                // await _hub.Clients.All.SendAsync("AchievementUnlocked", dto);
+            }
         }
 
         return newlyUnlocked.Select(a => new AchievementUnlockedDto

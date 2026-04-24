@@ -19,6 +19,7 @@ public class GameStoreDbContext : DbContext
     public DbSet<LeaderboardEntry> LeaderboardEntries { get; set; }
     public DbSet<DailyChallenge> DailyChallenges { get; set; }
     public DbSet<UserDailyChallengeProgress> UserDailyChallengeProgresses { get; set; }
+    public DbSet<UserStreak> UserStreaks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -184,12 +185,19 @@ public class GameStoreDbContext : DbContext
         {
             entity.HasKey(l => l.Id);
         });
+
         modelBuilder.Entity<DailyChallenge>(entity =>
         {
             entity.HasKey(d => d.Id);
         });
+
         modelBuilder.Entity<UserDailyChallengeProgress>()
         .HasIndex(x => new { x.UserId, x.ChallengeId })
         .IsUnique();
+
+        modelBuilder.Entity<UserStreak>(entity =>
+        {
+            entity.HasKey(s => s.UserId);
+        });
     }
 }
