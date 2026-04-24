@@ -3,8 +3,11 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using Microsoft.Extensions.Options;
 using GameStore.Api.DTOs;
-using Amazon.S3;
 using Amazon.S3.Model;
+using System.Diagnostics;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace GameStore.Api.Services
 {
@@ -95,6 +98,90 @@ namespace GameStore.Api.Services
                 listRequest.ContinuationToken = listResponse.NextContinuationToken;
             }
             while (listResponse.IsTruncated.GetValueOrDefault());
+        }
+
+        public async Task<string> ConvertDocxToPdf(Guid fileId, string inputKey, string outputKey)
+        {
+            var tempInputPath = Path.Combine(Path.GetTempPath(), $"{fileId}.docx");
+            var tempOutputDir = Path.GetTempPath();
+            var tempOutputPath = Path.Combine(tempOutputDir, $"{fileId}.pdf");
+
+            try
+            {
+                // 🔹 1. Download DOCX from S3
+                var response = await _s3Client.GetObjectAsync(_settings.BucketName, inputKey);
+
+                using (var fs = System.IO.File.Create(tempInputPath))
+                {
+                    await response.ResponseStream.CopyToAsync(fs);
+                }
+
+                // 🔹 2. Run LibreOffice
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "libreoffice",
+                        Arguments = $"--headless --convert-to pdf \"{tempInputPath}\" --outdir \"{tempOutputDir}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+
+                // 🔹 3. Check if PDF exists
+                if (!System.IO.File.Exists(tempOutputPath))
+                {
+                    var error = await process.StandardError.ReadToEndAsync();
+                    throw new Exception($"Conversion failed: {error}");
+                }
+
+                // 🔹 4. Upload PDF to S3
+                using var pdfStream = System.IO.File.OpenRead(tempOutputPath);
+
+                await UploadFileAsync(pdfStream, outputKey, "application/pdf");
+
+                return GetFileUrl(outputKey);
+            }
+            catch (Exception ex)
+            {
+                // 🔥 Log error (for real app, use a logging framework)
+                Console.WriteLine($"Error in ConvertDocxToPdf: {ex.Message}");
+                throw; // rethrow to let controller handle it
+            }
+            finally
+            {
+                // 🔥 Cleanup
+                if (System.IO.File.Exists(tempInputPath))
+                    System.IO.File.Delete(tempInputPath);
+
+                if (System.IO.File.Exists(tempOutputPath))
+                    System.IO.File.Delete(tempOutputPath);
+            }
+        }
+
+        public byte[] ConvertSingleImageToPdf(byte[] image)
+        {
+            using var stream = new MemoryStream();
+
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(10);
+
+                    page.Content()
+                        .Image(image, ImageScaling.FitArea);
+                });
+            })
+            .GeneratePdf(stream);
+
+            return stream.ToArray();
         }
 
         private string GetFileUrl(string key) =>
