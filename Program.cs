@@ -7,8 +7,12 @@ using GameStore.Api.Services;
 using GameStore.Api.DTOs;
 using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
+using GameStore.Api.Hubs;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var gameStoreConnectionString = string.Empty;
 var jwtKey = string.Empty;
@@ -170,8 +174,11 @@ builder.Services.AddScoped<ITrendingGameService, TrendingGameService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Services.AddScoped<IUserStatisticsService, UserStatisticsService>();
+builder.Services.AddScoped<StreakService>();
 builder.Services.AddHostedService<LeaderboardBackgroundService>();
 builder.Services.AddHostedService<DailyChallengeGeneratorService>();
+
+builder.Services.AddSignalR();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -202,6 +209,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.MapHub<RealtimeHub>("/realtimehub");
 
 app.UseCors("AllowGameStoreWeb");
 app.UseAuthentication();
